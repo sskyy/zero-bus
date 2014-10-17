@@ -1,60 +1,20 @@
-var config = require('./config')
+var path= require('path'),
+  Bus = require( path.join(process.cwd(),'system/core/bus')),
+  _ = require('lodash')
 
-
-var userModule = {
-  models : require('./models'),
-  listen : require('./listen')(config),
-  //this will allow app global config overwrite
-  config : config,
-  route : {
-    "/user/count" : function( req, res, next){
-      userModule.dep.model.models['user'].count().then(function(total){
-        res.json({count:total})
+/**
+ * 为所有其他模块提供 bus 服务。参见 Bus。
+ * @module bus
+ */
+module.exports = {
+  bus : new Bus,
+  expand : function( module ){
+    var root = this
+    if( module.listen ){
+      _.forEach(module.listen, function( listener, event){
+        root.bus.module(module.name)
+        root.bus.on(event, listener)
       })
-    },
-    "*" : {
-      "function" : function initSession(req,res,next){
-        //TODO only for dev
-        if( !req.session.user ){
-          userModule.dep.model.models['user'].count().then(function(total){
-            var skip = parseInt( total * Math.random())
-            userModule.dep.model.models['user'].find({limit:1,skip:skip}).then(function(users){
-//              console.log("====================setting session user===========", users[0].name)
-//              req.session.user = users[0]
-              next()
-            }).catch(function(err){
-              ZERO.error(err)
-              next()
-            })
-          })
-        }else{
-          next()
-        }
-
-
-
-
-        return
-
-//        if( req.session.user ){
-//          next()
-//        }else{
-//          //TODO only for dev
-//          userModule.dep.model.models['user'].find({limit:1}).then(function(users){
-//            req.session.user = users[0]
-//            next()
-//          }).catch(function(err){
-//            ZERO.error(err)
-//            next()
-//          })
-//        }
-
-      },
-      "order" : {first:true}
     }
-
   }
 }
-
-module.exports = userModule
-

@@ -16,5 +16,10 @@ module.exports = {
         root.bus.on(event, listener)
       })
     }
+  },
+  on : function( event, listener, moduleName ){
+    var root = this
+    root.bus.module(moduleName || root.relier)
+    root.bus.on( event, listener)
   }
 }

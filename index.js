@@ -8,6 +8,7 @@ var path= require('path'),
  */
 module.exports = {
   bus : null,
+  listeners : {},
   config : {
     longStackTraces: false,
     log : {
@@ -17,15 +18,13 @@ module.exports = {
     }
   },
   init : function(){
-    console.log("==================")
     this.bus = new Bus( this.config)
   },
   expand : function( module ){
     var root = this
     if( module.listen ){
       _.forEach(module.listen, function( listener, event){
-        root.bus.module(module.name)
-        root.bus.on(event, listener)
+        root.on( event, listener, module.name)
       })
     }
   },
@@ -33,5 +32,13 @@ module.exports = {
     var root = this
     root.bus.module(moduleName || root.relier)
     root.bus.on( event, listener)
+
+    if( !root.listeners[event] ) root.listeners[event] = []
+
+    root.listeners[event].push( {
+      module : moduleName || root.relier,
+      listener : listener.name || "anonymous"
+    })
+
   }
 }

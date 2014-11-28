@@ -13,7 +13,7 @@ There is super event emitter class named `Bus` in zero core. This module will cr
 	"name" : "YOUR_MODULE_NAME",
 	"zero" : {
 		"dependencies" : {
-			"board" : "^0.0.1"
+			"bus" : "^0.0.1"
 		}
 	}
 }

@@ -1,7 +1,10 @@
 {
   "name": "zero-bus",
-  "version": "0.0.11",
-  "description": "zero module",
+  "version": "0.0.12",
+  "keywords": [
+    "zero module"
+  ],
+  "description": "There is super event emitter class named `Bus` in zero core. This module will create  `bus` instance and attach it to every request instance. You can use it via `req.bus`.",
   "zero": {
     "dependencies": {}
   },

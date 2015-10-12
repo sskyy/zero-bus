@@ -1,25 +1,23 @@
 # zero-bus #
 
-
-There is super event emitter class named `Bus` in zero core. This module will create  `bus` instance and attach it to every request instance. You can use it via `req.bus`.
-
+This module  use `roof-bus` to create a global system event bus. Modules relying on this module can simply declare a `event-listener` map to handler logic events.
 
 ## Usage ##
 
-1. Add dependency to your module package.json file like:
+### 1. Add dependency to your module package.json file like:
 
 ```
 {
 	"name" : "YOUR_MODULE_NAME",
 	"zero" : {
 		"dependencies" : {
-			"bus" : "^0.0.1"
+			"bus" : "~0.2.0"
 		}
 	}
 }
 ```
 
-2. Declare the event you want to listen in module.exports like:
+### 2. Declare the event you want to listen in module.exports like:
 
 ```
 module.exports = {
@@ -30,24 +28,14 @@ module.exports = {
     }
 }
 ```
+Generator Function can also be use as listener.
 
-3. Or you can use it in router handler like(need declare dependency on module `request` first) :
-
-```
-module.exports = {
-	route ： {
-		anyRoute : function(req){
-			req.bus.fire('someEvent', arg1, arg2)
-		}
-	}
-}
-```
 
 ## Advanced Usage ##
 
-### specifying trigger order of listeners ###
+### Ordering Listeners ###
 
-Beside basic `on` and `fire` usage, bus has can specify the fire order of all listeners on certain event. For example:
+Fire order of listeners on the same event can be specified with `order` attribute like:
 
 ```
 bus.on({
@@ -59,28 +47,23 @@ bus.on({
 bus.on({
 	"event":'someEvent',
 	"function":function handler(){},
-	"order":{before:"otherModule.handlerName"}, //this will make this handler triggered before the one above
+	"order":{
+		before:"otherModule.handlerName" //make this handler triggered before the one above
+	},
 	"module":"someModule"
 })
 ```
 
-### share data through bus ###
+### sharing data through bus ###
 
-Use `bus.data()` to store and retrieve data.
+You can use `bus.data.set()` to store and `bus.data.get()` to retrieve data.
 
 ```
-bus.data('user',{id:1,name:'zero'}) //set data
-bus.data('user') //retrieve data
+bus.data.set('user',{id:1,name:'zero'}) //set data
+bus.data.get('user') //retrieve data
 
-bus.data('user.id',2) //this will set the user object's id to 2, instead of create a new piece of data.
+//advanced usage
+bus.data.set('user.id',2) //this will set the id of the object named `user` to 2, instead of creating a new piece of data named 'user.id'.
 ```
 
-
-### keep trace stack in right order ###
-
-As you may know, bus can trace fire stack in debug mode, if you want to use it you need to know some basic rules:
-
- - if you fired another event synchronously(like in a promise) in your event handler, you need to return a promise container the fire code as result.
- - you can return `bus.error()` to tell bus stop immediately.
- - can return a promise and make the promise object attribute `block` to `true`, so bus will wait for this promise resolved and then call next listener.
-
+For more usage, please check [http://github.com/sskyy/roof-bus](http://github.com/sskyy/roof-bus)
